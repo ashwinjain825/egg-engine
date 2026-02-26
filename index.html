@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogicNode AI | Futuristic Gate Solver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00ffc2;
+            --glass-bg: rgba(15, 15, 15, 0.8);
+            --border-glow: rgba(0, 255, 194, 0.2);
+        }
+
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+
+        .heading-font { font-family: 'Space Grotesk', sans-serif; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
+        /* Animations */
+        #chatHistory { scroll-behavior: smooth; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-msg { animation: slideIn 0.4s ease forwards; }
+
+        /* Glassmorphism */
+        .sidebar-glass {
+            background: var(--glass-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .card-glass {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+        .card-glass:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 20px rgba(0, 255, 194, 0.05);
+        }
+
+        .input-container {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        .input-container:focus-within {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 194, 0.15);
+        }
+
+        .neon-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 255, 194, 0.3);
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-72 sidebar-glass flex flex-col hidden lg:flex">
+        <div class="p-8">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 bg-[#00ffc2] rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(0,255,194,0.5)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <h1 class="heading-font font-bold text-2xl tracking-tighter">LOGIC<span class="neon-text">AI</span></h1>
+            </div>
+            <button onclick="clearChat()" class="w-full py-3 px-4 rounded-xl border border-white/10 hover:bg-white/5 transition text-sm flex items-center gap-3 mb-8 text-gray-300">
+                <span class="text-xl">+</span> New Session
+            </button>
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-4 font-bold">History</p>
+                <div class="space-y-2 text-sm text-gray-400">
+                    <div class="p-2 hover:text-[#00ffc2] cursor-pointer truncate">Simplifying (A ⊕ B)</div>
+                    <div class="p-2 hover:text-[#00ffc2] cursor-pointer truncate">4-Variable K-Map</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative bg-[#080808]">
+        
+        <header class="h-16 flex items-center justify-between px-8 border-b border-white/5 backdrop-blur-md sticky top-0 z-10">
+            <div class="text-xs font-mono text-gray-500">SYSTEM: <span class="text-green-500">ONLINE</span></div>
+            <div class="text-xs text-gray-400">Model: Quantum Logic Engine v4</div>
+        </header>
+
+        <section id="chatHistory" class="flex-1 overflow-y-auto p-6 md:p-10 pb-32 space-y-10">
+            <div id="welcomeMsg" class="max-w-4xl mx-auto text-center py-20 animate-msg">
+                <h2 class="text-4xl heading-font font-bold mb-4">Initialize <span class="neon-text">Logic Sequence</span></h2>
+                <p class="text-gray-500">Enter Boolean expressions to generate Truth Tables, K-Maps, and Circuit Diagrams.</p>
+            </div>
+        </section>
+
+        <footer class="absolute bottom-0 left-0 right-0 p-6 md:p-8 bg-gradient-to-t from-[#050505] via-[#050505] to-transparent">
+            <div class="max-w-4xl mx-auto">
+                <div class="input-container rounded-2xl flex flex-col">
+                    <div class="flex items-center px-4 py-2 gap-4">
+                        <textarea id="logicInput" rows="1" class="flex-1 bg-transparent border-none outline-none text-white resize-none py-3 font-mono text-sm placeholder-gray-600" placeholder="Type logic (e.g. A AND B OR NOT C)..."></textarea>
+                        <button onclick="handleSend()" class="bg-[#00ffc2] text-black h-10 px-6 rounded-xl font-bold hover:scale-105 transition shadow-[0_0_15px_rgba(0,255,194,0.3)]">SEND</button>
+                    </div>
+                    <div class="flex gap-4 px-4 pb-3 text-[10px] font-bold text-gray-500 border-t border-white/5 pt-2 mt-1">
+                        <button class="hover:text-[#00ffc2] transition" onclick="insertText('AND')">[AND]</button>
+                        <button class="hover:text-[#00ffc2] transition" onclick="insertText('OR')">[OR]</button>
+                        <button class="hover:text-[#00ffc2] transition" onclick="insertText('NOT')">[NOT]</button>
+                        <button class="hover:text-[#00ffc2] transition" onclick="insertText('XOR')">[XOR]</button>
+                        <span class="ml-auto text-gray-600 font-normal">Press Enter ↵</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <template id="userMsgTemplate">
+        <div class="max-w-4xl mx-auto flex justify-end animate-msg w-full">
+            <div class="bg-[#1a1a1a] border border-white/10 px-6 py-4 rounded-2xl rounded-tr-none text-[#00ffc2] shadow-xl max-w-[80%]">
+                <p class="font-mono text-sm font-bold user-text"></p>
+            </div>
+        </div>
+    </template>
+
+    <template id="aiMsgTemplate">
+        <div class="max-w-4xl mx-auto space-y-6 animate-msg w-full">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded bg-[#00ffc2] flex items-center justify-center text-black font-bold text-xs shadow-[0_0_10px_rgba(0,255,194,0.4)]">LN</div>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Analysis Complete</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card-glass p-6 rounded-2xl">
+                    <h3 class="text-[10px] font-bold text-[#00ffc2] uppercase tracking-[0.2em] mb-6">Truth Table</h3>
+                    <table class="w-full font-mono text-sm text-center">
+                        <thead class="text-gray-500 border-b border-white/10">
+                            <tr><th class="pb-3">A</th><th class="pb-3">B</th><th class="pb-3 text-[#00ffc2]">OUT</th></tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                            <tr class="border-b border-white/5"><td class="py-2">0</td><td class="py-2">0</td><td class="py-2">0</td></tr>
+                            <tr class="border-b border-white/5"><td class="py-2">0</td><td class="py-2">1</td><td class="py-2 text-[#00ffc2] font-bold">1</td></tr>
+                            <tr class="border-b border-white/5"><td class="py-2">1</td><td class="py-2">0</td><td class="py-2 text-[#00ffc2] font-bold">1</td></tr>
+                            <tr><td class="py-2">1</td><td class="py-2">1</td><td class="py-2 text-[#00ffc2] font-bold">1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-glass p-6 rounded-2xl flex flex-col items-center">
+                    <h3 class="text-[10px] font-bold text-[#00ffc2] uppercase tracking-[0.2em] mb-6 self-start">K-Map (2-Variable)</h3>
+                    <div class="grid grid-cols-3 gap-2 w-48 text-center font-mono mt-4">
+                        <div class="text-gray-600"></div><div class="text-xs text-gray-400">B0</div><div class="text-xs text-gray-400">B1</div>
+                        <div class="text-xs text-gray-400 self-center">A0</div><div class="bg-white/5 border border-white/10 p-3 rounded">0</div><div class="bg-[#00ffc2]/20 border border-[#00ffc2]/40 p-3 rounded text-white">1</div>
+                        <div class="text-xs text-gray-400 self-center">A1</div><div class="bg-[#00ffc2]/20 border border-[#00ffc2]/40 p-3 rounded text-white">1</div><div class="bg-[#00ffc2]/20 border border-[#00ffc2]/40 p-3 rounded text-white">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-glass p-6 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-[10px] font-bold text-purple-400 uppercase tracking-[0.2em] mb-3">Min-Terms (SOP)</h3>
+                    <div class="bg-black/60 p-3 rounded-lg border border-purple-500/20 font-mono text-sm text-gray-200">
+                        Σm(1, 2, 3) = <span class="text-purple-300">A'B + AB' + AB</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-[10px] font-bold text-blue-400 uppercase tracking-[0.2em] mb-3">Max-Terms (POS)</h3>
+                    <div class="bg-black/60 p-3 rounded-lg border border-blue-500/20 font-mono text-sm text-gray-200">
+                        ΠM(0) = <span class="text-blue-300">(A + B)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-glass p-8 rounded-2xl">
+                <h3 class="text-[10px] font-bold text-[#00ffc2] uppercase tracking-[0.2em] mb-6">Circuit Schematic Diagram</h3>
+                <div class="w-full h-48 bg-[#030303] border border-dashed border-white/10 rounded-xl flex items-center justify-center relative overflow-hidden">
+                    
+                    <div class="flex items-center gap-1 z-10">
+                        <div class="flex flex-col gap-6 font-mono text-xs text-gray-400 mr-2">
+                            <span>A &mdash;</span>
+                            <span>B &mdash;</span>
+                        </div>
+                        
+                        <div class="space-y-8">
+                            <div class="w-12 h-[2px] bg-gray-600"></div>
+                            <div class="w-12 h-[2px] bg-gray-600"></div>
+                        </div>
+
+                        <div class="relative w-24 h-20 border-2 border-[#00ffc2] rounded-r-[50px] border-l-0 flex items-center justify-center bg-[#00ffc2]/5 shadow-[0_0_20px_rgba(0,255,194,0.15)] ml-[-10px]">
+                            <div class="absolute -left-[10px] top-0 bottom-0 w-[20px] border-r-2 border-[#00ffc2] rounded-[50%]"></div>
+                            <span class="text-[10px] font-bold text-[#00ffc2] ml-2 tracking-widest">OR</span>
+                        </div>
+
+                        <div class="w-16 h-[2px] bg-[#00ffc2] shadow-[0_0_10px_#00ffc2]"></div>
+                        
+                        <span class="font-mono text-xs font-bold text-[#00ffc2] ml-2">Q</span>
+                    </div>
+
+                    <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="errorMsgTemplate">
+        <div class="max-w-4xl mx-auto animate-msg w-full">
+            <div class="p-6 bg-red-950/30 border border-red-500/40 rounded-2xl flex items-start gap-4 backdrop-blur-sm">
+                <span class="text-2xl mt-1">⚠️</span>
+                <div>
+                    <h4 class="font-bold heading-font text-red-400 text-lg">Invalid Expression</h4>
+                    <p class="text-sm text-red-300/80 mt-1 font-mono">Syntax Error: Unexpected or missing operator. Please verify your brackets and gate syntax.</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        const chatHistory = document.getElementById('chatHistory');
+        const logicInput = document.getElementById('logicInput');
+        const welcomeMsg = document.getElementById('welcomeMsg');
+
+        // Insert tags from quick buttons
+        function insertText(gate) {
+            logicInput.value += ` ${gate} `;
+            logicInput.focus();
+        }
+
+        // Main chat handler
+        function handleSend() {
+            const text = logicInput.value.trim();
+            if(!text) return;
+
+            // Hide welcome message on first send
+            if (welcomeMsg) welcomeMsg.style.display = 'none';
+
+            // 1. Render User Message
+            const userTemp = document.getElementById('userMsgTemplate').content.cloneNode(true);
+            userTemp.querySelector('.user-text').innerText = text;
+            chatHistory.appendChild(userTemp);
+            
+            logicInput.value = '';
+            scrollToBottom();
+
+            // 2. Simulate AI Processing
+            setTimeout(() => {
+                // Trigger error template if user types "error" or "invalid"
+                if(text.toLowerCase().includes('error') || text.toLowerCase().includes('invalid')) {
+                    const errorTemp = document.getElementById('errorMsgTemplate').content.cloneNode(true);
+                    chatHistory.appendChild(errorTemp);
+                } else {
+                    const aiTemp = document.getElementById('aiMsgTemplate').content.cloneNode(true);
+                    chatHistory.appendChild(aiTemp);
+                }
+                
+                scrollToBottom();
+            }, 500); // Half a second delay for chat feel
+        }
+
+        function scrollToBottom() {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function clearChat() {
+            chatHistory.innerHTML = '';
+            if (welcomeMsg) {
+                welcomeMsg.style.display = 'block';
+                chatHistory.appendChild(welcomeMsg);
+            }
+        }
+
+        // Handle 'Enter' key to send (Shift+Enter for new line)
+        logicInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+    </script>
+</body>
+</html>
