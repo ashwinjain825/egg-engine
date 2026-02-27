@@ -1,4 +1,4 @@
-function truthTable(expr) {
+function generateTruthTable(expr) {
     const variables = [...new Set(expr.match(/[A-Z]/g))].sort();
     const n = variables.length;
 
