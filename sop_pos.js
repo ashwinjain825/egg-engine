@@ -1,14 +1,9 @@
 function generateSOP_POS(expr) {
-
-    // Extract variables
     const variables = [...new Set(expr.match(/[A-Z]/g))].sort();
     const n = variables.length;
 
-    if (n === 0 || n > 3) {
-        throw new Error("Expression must contain 1 to 3 variables.");
-    }
+    if (n === 0 || n > 3) throw new Error("Expression must contain 1 to 3 variables.");
 
-    // Convert Boolean syntax to JS
     let jsExpr = expr
         .replace(/\s+/g, "")
         .replace(/([A-Z])'/g, "!$1")
@@ -17,13 +12,14 @@ function generateSOP_POS(expr) {
         .replace(/\^/g, "!=");
 
     const func = new Function(...variables, `return ${jsExpr};`);
-
     const rows = Math.pow(2, n);
+    
     const minterms = [];
     const maxterms = [];
+    const minIndices = []; // Added to track Σm numbers
+    const maxIndices = []; // Added to track ΠM numbers
 
     for (let i = 0; i < rows; i++) {
-
         const values = {};
         const bits = [];
 
@@ -35,25 +31,23 @@ function generateSOP_POS(expr) {
 
         const result = func(...variables.map(v => values[v]));
 
-        // For SOP → collect rows where F = 1
         if (result) {
-            const term = variables.map((v, idx) =>
-                bits[idx] === 1 ? v : v + "'"
-            ).join(".");
-            minterms.push(`(${term})`);
+            minIndices.push(i);
+            const term = variables.map((v, idx) => bits[idx] === 1 ? v : v + "'").join("");
+            minterms.push(term); // Removed extra brackets for standard SOP look
         }
 
-        // For POS → collect rows where F = 0
         if (!result) {
-            const term = variables.map((v, idx) =>
-                bits[idx] === 0 ? v : v + "'"
-            ).join("+");
+            maxIndices.push(i);
+            const term = variables.map((v, idx) => bits[idx] === 0 ? v : v + "'").join("+");
             maxterms.push(`(${term})`);
         }
     }
 
     return {
-        SOP: minterms.length ? minterms.join("+") : "0",
-        POS: maxterms.length ? maxterms.join(".") : "1"
+        sopIndices: minIndices.join(", "),
+        posIndices: maxIndices.join(", "),
+        SOP: minterms.length ? minterms.join(" + ") : "0",
+        POS: maxterms.length ? maxterms.join(" . ") : "1"
     };
 }
