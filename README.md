@@ -1,50 +1,42 @@
 # 🥚 EGG Engine: Expression to Gate Generator
 
-> **"Let's Boil the EGG"** 🔥
+> **"Let's Boil the EGG"** 
 
-
-
-**EGG_Engine** is a sleek, cyberpunk-inspired frontend interface built to simulate an advanced Boolean logic evaluator. Designed with a conversational, ChatGPT-style UX, it takes raw logic expressions from the user and "boils" them down into modular, visually stunning analytical blocks—including Truth Tables, Karnaugh Maps, Min/Max Terms, and CSS-rendered Circuit Diagrams.
-
-
+**EGG_Engine** is an interactive Boolean logic evaluator and circuit synthesizer. Operating via a REPL-style interface, it parses raw Boolean algebraic expressions and compiles them into comprehensive analytical models. The engine dynamically calculates state permutations to generate Truth Tables, Karnaugh Maps, canonical expressions, and structural circuit schematics.
 
 ---
 
-## Features
+## Core Features
 
-* **Conversational Interface**: A dynamic chat loop where user inputs slide in, followed by the engine processing and serving the formatted logic results.
-* **Futuristic Aesthetic**: Uses a deep obsidian (`#050505`) palette, glassmorphism (frosted glass) effects, and glowing neon cyan (`#00ffc2`) accents.
-* **Modular Analytical Blocks**: 
-    * **Truth Tables**: Clean, mono-spaced tables mapping input combinations to outputs.
-    * **Karnaugh Maps (K-Maps)**: Custom CSS grids simulating 2-variable K-Maps.
-    * **Min/Max Terms**: Separate visual blocks for Sum of Products (SOP) and Product of Sums (POS).
-    * **Schematic Engine**: A purely CSS/HTML-drawn logic circuit representation (no external SVGs or images required).
-* **Quick-Insert Logic Tags**: Dedicated buttons `[AND]`, `[OR]`, `[NOT]`, `[XOR]` above the input bar for rapid expression building.
-* **Simulated Error State**: Built-in logic to demonstrate syntax validation and error handling when a bad expression is fed to the engine.
+* **Expression Parsing & Evaluation**: Processes standard Boolean logic strings utilizing fundamental operators (`AND`, `OR`, `NOT`, `XOR`).
+* **Algorithmic Truth Table Generation**: Computes all possible permutations of input variables ($2^n$ states) to determine the corresponding boolean output matrix.
+* **Karnaugh Map (K-Map) Synthesis**: Maps the evaluated truth table logic onto a 2-variable coordinate grid, aiding in the visualization of boolean simplification. 
 
+* **Canonical Form Derivation**: Automatically extracts Minterms (Sum of Products / SOP) and Maxterms (Product of Sums / POS) directly from the active logic states.
+* **Structural Schematic Rendering**: Translates the expression's logical hierarchy into a DOM-based schematic using CSS-drawn logic gates, bypassing external rendering libraries or SVGs.
 
+* **Real-time Syntax Validation**: Built-in error trapping to detect and alert users of invalid expressions, missing operands, or malformed Boolean syntax.
 
-## Tech Stack
+## Technical Architecture
 
-* **HTML5**: Semantic structure and modular `<template>` tags for chat elements.
-* **Tailwind CSS (via CDN)**: Rapid, utility-first styling for layout, typography, and responsive design.
-* **Vanilla JavaScript**: Handles DOM manipulation, chat animations, auto-scrolling, and quick-insert logic.
-* **Custom CSS**: Specific glowing effects, scrollbar styling, and structural circuit diagramming.
+* **Markup & Node Injection**: HTML5 combined with modular `<template>` elements to handle dynamic DOM construction without framework overhead.
+* **Styling & Grid Mathematics**: Utility-first CSS (Tailwind) utilized for exact matrix alignments (K-Maps) and responsive data tables, supplemented by raw CSS algorithms for geometric circuit node drawing.
+* **Logic & State Management**: Vanilla JavaScript powers the core engine—handling event listening, expression string parsing, bitwise evaluations, and the conditional rendering of output modules.
 
-## Quick Start (Zero Setup)
+## Initialization (Zero Setup)
 
-Because this project is built entirely as a single-file static frontend, there are no build steps, dependencies, or node modules required to get the EGG boiling.
+As a purely client-side static engine, EGG_Engine requires no build steps, package managers, or backend dependencies.
 
-1.  **Clone or Download** the repository.
-2.  Open the `index.html` file directly in any modern web browser (Chrome, Firefox, Safari, Edge).
-3.  Start typing logic!
+1.  **Clone or Download** the repository to your local machine.
+2.  Execute the application by opening `index.html` directly in any modern web browser.
+3.  Initialize the logic sequence.
 
-## How to Use (Demo Guide)
+## Execution Guide
 
-* **Standard Input**: Type a Boolean expression like `A AND B` or `(A OR B) AND C` into the bottom input bar and press **Enter** (or click **SEND**).
-* **Shortcuts**: Click the quick-insert buttons (`[AND]`, `[OR]`, etc.) to instantly add them to your input.
-* **Trigger an Error**: To see the custom error UI state, type the word `error` or `invalid` into your expression (e.g., `A AND error B`) and hit **Enter**.
-* **New Session**: Click the `+ New Session` button in the sidebar to clear the chat history and start fresh.
+* **Standard Evaluation**: Input a Boolean expression (e.g., `A AND B` or `(A OR B) AND C`) into the command bar and execute via the **Enter** key or the **SEND** trigger.
+* **Operator Shortcuts**: Utilize the quick-insert parameter tags (`[AND]`, `[OR]`, `[NOT]`, `[XOR]`) to rapidly construct complex expressions.
+* **Exception Handling Demo**: To observe the syntax validation and error-trapping state, input an intentionally malformed string containing the keywords `error` or `invalid` (e.g., `A AND error B`) and execute.
+* **Session Reset**: Click the `+ New Session` command to flush the DOM history and re-initialize the engine state.
 
 ---
 Created By Ashwin Jain
