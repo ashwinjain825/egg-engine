@@ -8,9 +8,40 @@ function generateKMap(expr) {
     }
 
     // Convert Boolean syntax to JS
-    let jsExpr = expr
-        .replace(/\s+/g, "")
-        .replace(/([A-Z])'/g, "!$1")
+    let jsExpr = expr.replace(/\s+/g, "");
+    
+    // 1. Fix individual variable NOTs (e.g., A' -> !A)
+    jsExpr = jsExpr.replace(/([A-Z])'/g, "!$1");
+
+    // 2. Fix Bracket NOTs safely using a depth counter (e.g., (A+B)' -> !(A+B))
+    while (jsExpr.includes(")'")) {
+        let replaced = false;
+        for (let i = 0; i < jsExpr.length - 1; i++) {
+            if (jsExpr[i] === ')' && jsExpr[i+1] === "'") {
+                let depth = 0;
+                let openPos = -1;
+                // Trace backward to find the matching '('
+                for (let j = i; j >= 0; j--) {
+                    if (jsExpr[j] === ')') depth++;
+                    if (jsExpr[j] === '(') depth--;
+                    if (depth === 0) {
+                        openPos = j;
+                        break;
+                    }
+                }
+                if (openPos !== -1) {
+                    // Rewrite string with the ! moved to the front
+                    jsExpr = jsExpr.substring(0, openPos) + "!(" + jsExpr.substring(openPos + 1, i) + ")" + jsExpr.substring(i + 2);
+                    replaced = true;
+                    break; // Restart the while loop with the newly formatted string
+                }
+            }
+        }
+        if (!replaced) break; // Failsafe to absolutely prevent infinite loops
+    }
+
+    // 3. Convert remaining operators
+    jsExpr = jsExpr
         .replace(/\+/g, "||")
         .replace(/\./g, "&&")
         .replace(/\^/g, "!=");

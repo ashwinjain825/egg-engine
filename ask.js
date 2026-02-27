@@ -63,19 +63,19 @@ function ask(expr) {
             }
 
             // 6. Inject Dynamic Circuit Schematic
-            const schematicContainer = currentMsg.querySelector('.bg-\\[\\#030303\\]'); // Selects the black schematic box
+            const schematicContainer = currentMsg.querySelector('.bg-\\[\\#030303\\]'); 
             
             if (schematicContainer) {
                 const ast = generateSchematicAST(expr);
                 const schematicHTML = renderSchematicHTML(ast);
                 
-                // Wrap the rendered tree with the final Output (Q) wire
                 schematicContainer.innerHTML = `
-                    <div class="flex items-center justify-center w-full h-full overflow-x-auto p-4 z-10">
+                    <div class="flex items-center justify-center w-max min-w-full h-auto z-10 relative">
                         ${schematicHTML}
                         <div class="w-8 h-[2px] bg-[#00ffc2] shadow-[0_0_10px_#00ffc2]"></div>
                         <span class="font-mono text-xs font-bold text-[#00ffc2] ml-2 bg-black px-2 py-1 rounded">OUT</span>
                     </div>
+                    
                     <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 20px 20px;"></div>
                 `;
             }
