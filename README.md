@@ -48,4 +48,3 @@ Because this project is built entirely as a single-file static frontend, there a
 
 ---
 Created By Ashwin Jain
-*Powered by EGG_Engine Core v1.0* 🤖
