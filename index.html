@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="resources/colored_logo.png">
     <script src="truth_table.js"></script>
     <script src="sop_pos.js"></script>
     <script src="ask.js"></script>
@@ -81,14 +82,18 @@
     <aside class="w-72 sidebar-glass flex flex-col hidden lg:flex">
         <div class="p-8">
             <div class="flex items-center gap-3 mb-10">
-                <div class="w-10 h-10 bg-[#00ffc2] rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(0,255,194,0.5)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                
+                <div class="w-10 h-10 bg-[#1a1a1a] border border-white/10 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(0,255,194,0.3)] overflow-hidden">
+                    <img src="resources/colored_logo.png" alt="EGG Logo" class="w-8 h-8 object-contain">
                 </div>
+
                 <h1 class="heading-font font-bold text-2xl tracking-tighter">EGG - <span class="neon-text">Engine</span></h1>
             </div>
+            
             <button onclick="clearChat()" class="w-full py-3 px-4 rounded-xl border border-white/10 hover:bg-white/5 transition text-sm flex items-center gap-3 mb-8 text-gray-300">
                 <span class="text-xl">+</span> New Session
             </button>
+            
             <div>
                 <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-4 font-bold">History</p>
                 <div class="space-y-2 text-sm text-gray-400">
